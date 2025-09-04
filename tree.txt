@@ -1,0 +1,45 @@
+BrunellaAgentSystem/
+├── .env
+├── .gitignore
+├── agent.png
+├── app.png
+├── config.yaml                # Ügynök + memória konfiguráció
+├── docker-compose.yml         # Konténerizált stack
+├── LICENSE
+├── main.py                    # Belépési pont
+├── Makefile
+├── README.md
+├── run-stack.bat              # Stack indítás Windows alatt
+├── run_server.py              # Backend indítás
+├── stop-stack.bat             # Stack leállítás
+├── struktur.txt               # Könyvtárfa export
+│
+├── .vscode/
+│   └── settings.json          # Fejlesztői beállítások
+│
+└── backend/
+    ├── .env
+    ├── .env.example
+    ├── .gitignore
+    ├── Dockerfile
+    ├── langgraph              # LangGraph konfig és logika
+    ├── langgraph.json
+    ├── LICENSE
+    ├── Makefile
+    ├── pyproject.toml         # Python csomagkezelés
+    ├── run-backend.bat
+    ├── test-agent.ipynb       # Jupyter notebook (ügynök teszteléshez)
+    │
+    ├── .langgraph_api/        # Állapot checkpointok
+    │   ├── .langgraph_checkpoint.1.pckl
+    │   ├── .langgraph_checkpoint.2.pckl
+    │   ├── store.pckl
+    │   ├── store.vectors.pckl
+    │   └── ...
+    │
+    └── .venv311/              # Virtuális környezet + dependency-k
+        ├── pyvenv.cfg
+        ├── Include/
+        ├── Lib/
+        │   └── site-packages/ (FastAPI, crewai, google-ai stb.)
+        └── ...

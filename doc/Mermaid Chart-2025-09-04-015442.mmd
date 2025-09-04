@@ -1,0 +1,25 @@
+---
+config:
+  theme: default
+  look: classic
+---
+sequenceDiagram
+    participant User as Felhasználó
+    participant API as Backend API (/command - run_server.py)
+    participant Brunella as Projektmenedzser Agent
+    participant Researcher as Kutató Agent
+    participant Coder as Kódoló Agent
+    participant QA as Minőségellenőr Agent
+    participant Memory as SQLite + LangGraph Store
+    User->>API: POST /command {"task": "..."}
+    API->>Brunella: Új feladat indítása
+    Brunella->>Memory: Kontextus lekérdezés/mentés
+    Brunella->>Researcher: "Gyűjts információt"
+    Researcher->>Brunella: Kutatási eredmények
+    Brunella->>Coder: "Írd meg a kódot/specifikációt"
+    Coder->>Brunella: Kód implementáció
+    Brunella->>QA: "Ellenőrizd a kódot"
+    QA->>Brunella: Jóváhagyás / hibajelentés
+    QA->>Memory: Mentés (eredmény, státusz)
+    Brunella->>API: Összesített eredmény
+    API->>User: JSON válasz {"result": "..."}

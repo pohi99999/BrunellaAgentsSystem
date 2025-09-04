@@ -1,10 +1,10 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "agent": "./src/agent/graph.py:graph"
+    "agent": "src.agent.graph:graph"
   },
   "http": {
-    "app": "./src/agent/app.py:app"
+    "app": "src.app:app"
   },
   "env": ".env"
 }

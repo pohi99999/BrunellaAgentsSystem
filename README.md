@@ -61,6 +61,57 @@ This will run the backend and frontend development servers.    Open your browser
 
 _Alternatively, you can run the backend and frontend development servers separately. For the backend, open a terminal in the `backend/` directory and run `langgraph dev`. The backend API will be available at `http://127.0.0.1:2024`. It will also open a browser window to the LangGraph UI. For the frontend, open a terminal in the `frontend/` directory and run `npm run dev`. The frontend will be available at `http://localhost:5173`._
 
+### Windows (PowerShell) Troubleshooting & Helper Scripts
+
+On Windows, the `langgraph` CLI might not be found even after installation if you are in a different Python version or the virtual environment is not activated. We created / use a Python 3.11 virtual environment named `.venv311` at the project root.
+
+Quick commands (PowerShell):
+
+```powershell
+# Create env (already done once)
+py -3.11 -m venv .venv311
+
+# Activate it
+./.venv311/Scripts/Activate.ps1
+
+# Install backend (editable) with dev extras
+pip install -e backend/[dev]
+
+# If langgraph command still not found, invoke via explicit path
+./.venv311/Scripts/langgraph.exe dev --config backend/langgraph.json
+
+# Or (module form if needed)
+python -m langgraph_cli.main dev --config backend/langgraph.json
+```
+
+If you only want a plain FastAPI server (no LangGraph UI) you can run:
+
+```powershell
+python run_server.py  # serves at http://127.0.0.1:8000
+```
+
+Then set `apiUrl` in `frontend/src/App.tsx` to `http://localhost:8000/agent` (or adjust routes accordingly) until the LangGraph dev server works on 2024.
+
+### Current Progress Log (Automated Update)
+
+This section is appended by the assistant to track implementation progress:
+
+| Date (UTC) | Change | Notes |
+|------------|--------|-------|
+| 2025-08-29 | Added troubleshooting section & PowerShell steps | `langgraph` CLI not resolving; use explicit path/module fallback. |
+| 2025-08-29 | Verified backend graph & tools structure | Graph compiles; research specialist loaded. |
+| 2025-08-29 | Added guidance for plain uvicorn fallback | Use `run_server.py` on port 8000 if dev server blocked. |
+| 2025-08-29 | Added helper scripts | `backend/scripts/start_langgraph_dev.ps1` and `diagnose_cli.py`. |
+
+Next Planned Steps:
+
+1. Ensure `langgraph` CLI executable exists at `./.venv311/Scripts/langgraph.exe`.
+2. Launch dev server on port 2024 and validate `/agent` endpoint streaming.
+3. Add minimal automated test script for CLI invocation.
+4. (Optional) Remove unused dependency `google-cloud-managed-identities` if not leveraged.
+
+If picking up after this point, start by activating the venv and trying the explicit path to `langgraph.exe` as shown above.
+
 ## How the Backend Agent Works (High-Level)
 
 The core of the backend is a LangGraph agent defined in `backend/src/agent/graph.py`. It follows these steps:

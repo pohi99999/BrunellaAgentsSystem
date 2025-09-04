@@ -1,4 +1,10 @@
 import argparse
+import sys
+import os
+
+# Add the backend src directory to the Python path for module resolution
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
 from langchain_core.messages import HumanMessage
 from agent.graph import graph
 

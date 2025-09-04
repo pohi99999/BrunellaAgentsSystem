@@ -1,0 +1,79 @@
+llm:
+  default_provider: openai
+  models:
+    gemini:
+      provider: google
+      model: gemini-1.5-flash
+      api_key: ${GEMINI_API_KEY}
+    qwen:
+      provider: openai
+      model: qwen2.5-coder-32b-instruct
+      base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: ${OPENAI_API_KEY}
+    copilot:
+      provider: github
+      model: copilot-gpt-4
+      api_key: ${GITHUB_COPILOT_KEY}
+    jules:
+      provider: internal
+      model: repo-manager-agent
+      endpoint: http://localhost:5005/jules
+    gemma:
+      provider: huggingface
+      model: google/gemma-0.27b
+      device: cpu   # vagy gpu, ha van
+      api_key: ${HF_API_KEY}
+
+memory:
+  enabled: true
+  type: sqlite
+  path: ./brunella_memory.db
+
+agents:
+  - name: Brunella
+    role: Projektmenedzser
+    model: gemini
+    instructions: >
+      Koordinálja a csapatot, feladatokat oszt, workflow-t vezényel.
+
+  - name: Researcher
+    role: Kutató ügynök
+    model: gemini
+    instructions: >
+      Gyűjts információt AI architektúrákról, kódmintákról, best practice-ekről.
+
+  - name: Coder
+    role: Kódoló ügynök
+    model: qwen
+    instructions: >
+      Írj tiszta és működő Python/FastAPI kódot a specifikáció alapján.
+
+  - name: QA
+    role: Minőségellenőr
+    model: copilot
+    instructions: >
+      Review-old a kódot, jelezd a hibákat, javasolj refaktorokat.
+
+  - name: RepoOps
+    role: Repository Manager (Jules)
+    model: jules
+    instructions: >
+      Figyeld a GitHub repót, triggereld a PR review-t, kezeld a CI/CD pipeline-t.
+
+  - name: Watchdog
+    role: Előszűrő Mini-Agent
+    model: gemma
+    instructions: >
+      Gyors előszűrés: figyeld a logokat és a promptokat, jelöld a gyanús/hulladék inputot.
+
+workflow:
+  - step: Researcher
+    next: Coder
+  - step: Coder
+    next: QA
+  - step: QA
+    next: RepoOps
+  - step: RepoOps
+    next: Brunella
+  - step: Watchdog
+    next: Brunella
