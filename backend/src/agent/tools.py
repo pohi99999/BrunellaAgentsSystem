@@ -1,7 +1,8 @@
 from langchain_core.tools import tool
 from agent.specialists.research_agent.graph import graph as research_graph
 from langchain_core.messages import HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+import os
+import openai
 
 @tool
 def research_tool(query: str) -> str:
@@ -11,15 +12,21 @@ def research_tool(query: str) -> str:
 
 @tool
 def qwen3_coder_tool(query: str) -> str:
-    """Use this tool for coding tasks, like generating or modifying code."""
-    print(f"--- Calling Qwen3 Coder Specialist with query: {query} ---")
+    """
+    Use this tool for coding tasks. It takes a query describing the desired code,
+    calls the Qwen3 Coder model via an OpenAI-compatible endpoint, and returns the generated code.
+    """
+    print(f"--- Calling real Qwen3 Coder with query: {query} ---")
     
-    # In a real scenario, this would be a dedicated API call to the Qwen3 model.
-    # Here, we simulate it using Gemini to generate a plausible code snippet.
+    api_key = os.getenv("QWEN_API_KEY")
+    if not api_key:
+        return "# Error: QWEN_API_KEY environment variable not set."
+
     try:
-        # It's better practice to reuse an LLM instance if possible,
-        # but creating one here makes the tool self-contained.
-        coder_llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0.1)
+        client = openai.OpenAI(
+            api_key=api_key,
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        )
         
         prompt = f'''You are an expert Python coding agent named Qwen3-coder. Your sole task is to generate clean, functional Python code based on the user's request.
 Do not provide any explanations, comments, or markdown formatting. Only output the raw code.
@@ -27,8 +34,16 @@ Do not provide any explanations, comments, or markdown formatting. Only output t
 User Request: {query}
 Generated Code:'''
         
-        response = coder_llm.invoke(prompt)
-        generated_code = response.content
+        response = client.chat.completions.create(
+            model="qwen2.5-32b-instruct",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.1,
+        )
+        
+        generated_code = response.choices[0].message.content
         
         # Basic cleanup to remove potential markdown fences
         if generated_code.strip().startswith("```python"):
@@ -38,4 +53,4 @@ Generated Code:'''
 
         return generated_code
     except Exception as e:
-        return f"# Error calling Qwen3 Coder: {e}"
+        return f"# Error calling Qwen3 Coder API: {e}"

@@ -40,7 +40,7 @@ Follow these steps to get the application running locally for development and te
 
 ```bash
 cd backend
-pip install .
+pip install -e .[dev]
 ```
 
 **Frontend:**
@@ -98,6 +98,7 @@ This section is appended by the assistant to track implementation progress:
 
 | Date (UTC) | Change | Notes |
 |------------|--------|-------|
+| 2025-09-08 | System Debugging & Stabilization | Fixed backend crash loop. The `backend/Dockerfile` was calling `uvicorn app:app` instead of `uvicorn src.app:app`. Corrected the path, rebuilt the image, and confirmed all services are stable. |
 | 2025-08-29 | Added troubleshooting section & PowerShell steps | `langgraph` CLI not resolving; use explicit path/module fallback. |
 | 2025-08-29 | Verified backend graph & tools structure | Graph compiles; research specialist loaded. |
 | 2025-08-29 | Added guidance for plain uvicorn fallback | Use `run_server.py` on port 8000 if dev server blocked. |
@@ -168,4 +169,4 @@ Open your browser and navigate to `http://localhost:8123/app/` to see the applic
 
 ## License
 
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details. 
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

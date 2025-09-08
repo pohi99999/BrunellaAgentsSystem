@@ -18,4 +18,4 @@ COPY . /app
 RUN poetry install --no-root --no-interaction --no-ansi
 
 # Indítsd az API-t Uvicorn-nal
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]

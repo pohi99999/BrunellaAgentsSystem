@@ -19,11 +19,14 @@ dependencies = [
     "fastapi",
     "google-genai",
     "google-cloud-managed-identities",
+    "langchain-community",
+    "tavily-python",
+    "openai",
 ]
 
 
 [project.optional-dependencies]
-dev = ["mypy>=1.11.1", "ruff>=0.6.1"]
+dev = ["mypy>=1.11.1", "ruff>=0.6.1", "pytest>=8.3.5", "httpx>=0.27.0"]
 
 [build-system]
 requires = ["setuptools>=73.0.0", "wheel"]
@@ -57,4 +60,5 @@ convention = "google"
 dev = [
     "langgraph-cli[inmem]>=0.1.71",
     "pytest>=8.3.5",
+    "httpx>=0.27.0",
 ]
