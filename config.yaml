@@ -1,0 +1,32 @@
+# config.yaml - Gemini CLI / Brunella
+llm:
+  provider: openai
+  model: qwen2.5-coder-32b-instruct
+  base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  api_key: ${OPENAI_API_KEY}
+
+memory:
+  enabled: true
+  type: sqlite
+  path: ./brunella_memory.db
+
+agents:
+  brunella:
+    role: "Projektmenedzser"
+    goal: "Feladatok delegálása és a csapat koordinálása"
+    backstory: "Brunella egy AI menedzser ügynök, aki irányítja a kutató, kódoló és minőségellenőr ügynököket."
+
+  researcher:
+    role: "Kutató ügynök"
+    goal: "Gyűjts információt AI architektúrákról és legújabb technikákról"
+    backstory: "Tapasztalt AI kutató."
+
+  coder:
+    role: "Kódoló ügynök"
+    goal: "Írjon tiszta, működő kódot a kapott specifikációk alapján"
+    backstory: "Python és FastAPI specialista."
+
+  qa:
+    role: "Minőségellenőr"
+    goal: "Ellenőrizze a kódot és adjon visszajelzést"
+    backstory: "Kritikus szemű tesztelő."
