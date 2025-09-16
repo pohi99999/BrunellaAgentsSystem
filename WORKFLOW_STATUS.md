@@ -110,3 +110,11 @@ Invoke-RestMethod -Method POST -Uri http://127.0.0.1:8000/coder/generate -Body $
 ---
 
 Ezt a státuszt folytatáskor érdemes elsőként beolvasni: tartalmazza az aktuális technikai döntéseket, ismert állapotot és a következő lépések sorrendjét.
+
+## GitHub szinkron és PR (2025-09-16)
+
+- Távoli tárhely: `https://github.com/pohi99999/BrunellaAgentsSystem.git`
+- Feltöltött branch: `brunella-initial-import-2025-09-16`
+- PR létrehozása (link): `https://github.com/pohi99999/BrunellaAgentsSystem/pull/new/brunella-initial-import-2025-09-16`
+- Miért külön branch? A távoli `main` már tartalmaz commitokat; így konfliktus és force-push nélkül integrálható a változás PR-on keresztül.
+
