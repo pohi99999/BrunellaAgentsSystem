@@ -1,5 +1,5 @@
 from langchain_core.tools import tool
-from backend.src.specialists.research_agent.graph import graph as research_graph
+from agent.specialists.research_agent.graph import graph as research_graph
 from langchain_core.messages import HumanMessage
 import os
 import openai
