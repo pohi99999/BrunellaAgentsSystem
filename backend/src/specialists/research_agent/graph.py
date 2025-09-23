@@ -33,11 +33,13 @@ from .utils import (
 
 load_dotenv()
 
-if os.getenv("GEMINI_API_KEY") is None:
+if os.getenv("GEMINI_API_KEY") is None and "PYTEST_CURRENT_TEST" not in os.environ:
     raise ValueError("GEMINI_API_KEY is not set")
 
 # Used for Google Search API
-genai_client = Client(api_key=os.getenv("GEMINI_API_KEY"))
+genai_client = None
+if "PYTEST_CURRENT_TEST" not in os.environ:
+    genai_client = Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 # Nodes

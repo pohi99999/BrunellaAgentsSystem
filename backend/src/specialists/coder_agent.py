@@ -9,9 +9,10 @@ try:
     _HAS_LANGCHAIN_OLLAMA = True
 except Exception:
     _HAS_LANGCHAIN_OLLAMA = False
-    import json
-    import urllib.request
-    import urllib.error
+
+import json
+import urllib.request
+import urllib.error
 
 # Rendszer-prompt, ami instruálja a modellt, hogy viselkedjen kódolóként
 CODE_GENERATION_SYSTEM_PROMPT = """
@@ -23,6 +24,36 @@ Kizárólagos feladatod, hogy a kapott prompt alapján magas minőségű, tiszta
 - Csak és kizárólag a kért kódot add vissza.
 - Ha a kérés nem egyértelmű vagy nem biztonságos, adj vissza egyetlen sort: '# HIBA: A kérés nem feldolgozható.'
 """
+
+class _SimpleOllamaChain:
+    def __init__(self, model: str, base_url: str):
+        self.model = model
+        self.base_url = base_url.rstrip("/")
+
+    def invoke(self, inputs: dict) -> str:
+        language = inputs.get("language", "")
+        task = inputs.get("prompt", "")
+        full_prompt = f"{CODE_GENERATION_SYSTEM_PROMPT}\n\nProgramozási nyelv: {language}\n\nFeladat: {task}"
+        payload = {
+            "model": self.model,
+            "prompt": full_prompt,
+            "stream": False,
+            "options": {"temperature": 0},
+        }
+        req = urllib.request.Request(
+            url=f"{self.base_url}/api/generate",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return data.get("response", "")
+        except urllib.error.HTTPError as e:
+            return f"# HIBA: HTTP {e.code} {e.reason}"
+        except Exception as e:  # pragma: no cover
+            return f"# HIBA: {e}"
 
 def get_coder_agent_executor():
     """
@@ -45,36 +76,6 @@ def get_coder_agent_executor():
         ])
         llm = ChatOllama(model=model_name, temperature=0, base_url=base_url)
         return prompt | llm | StrOutputParser()
-
-    class _SimpleOllamaChain:
-        def __init__(self, model: str, base_url: str):
-            self.model = model
-            self.base_url = base_url.rstrip("/")
-
-        def invoke(self, inputs: dict) -> str:
-            language = inputs.get("language", "")
-            task = inputs.get("prompt", "")
-            full_prompt = f"{CODE_GENERATION_SYSTEM_PROMPT}\n\nProgramozási nyelv: {language}\n\nFeladat: {task}"
-            payload = {
-                "model": self.model,
-                "prompt": full_prompt,
-                "stream": False,
-                "options": {"temperature": 0},
-            }
-            req = urllib.request.Request(
-                url=f"{self.base_url}/api/generate",
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            try:
-                with urllib.request.urlopen(req, timeout=120) as resp:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    return data.get("response", "")
-            except urllib.error.HTTPError as e:
-                return f"# HIBA: HTTP {e.code} {e.reason}"
-            except Exception as e:  # pragma: no cover
-                return f"# HIBA: {e}"
 
     return _SimpleOllamaChain(model=model_name, base_url=base_url)
 

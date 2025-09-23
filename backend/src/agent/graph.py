@@ -12,14 +12,16 @@ from .state import AgentState
 from .tools import research_tool, qwen3_coder_tool
 
 # Set up the tool-calling model
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
+# llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
 tools = [research_tool, qwen3_coder_tool]
-llm_with_tools = llm.bind_tools(tools)
+# llm_with_tools = llm.bind_tools(tools)
 
 # Define the orchestrator node
 def orchestrator_node(state: AgentState):
     """The main node that decides which tool to call based on the user's request."""
     # Get the latest message
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
+    llm_with_tools = llm.bind_tools(tools)
     message = state["messages"][-1]
     # Call the model with the message and tools
     response = llm_with_tools.invoke(message)
