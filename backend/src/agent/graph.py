@@ -1,15 +1,12 @@
 
-import os
 from typing import Literal
 
-from langchain_core.messages import ToolCall
-from langgraph.graph import StateGraph, START
-from langgraph.graph.message import AnyMessage, add_messages
-from langgraph.prebuilt import ToolNode
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.graph import START, StateGraph
+from langgraph.prebuilt import ToolNode
 
 from .state import AgentState
-from .tools import research_tool, qwen3_coder_tool
+from .tools import qwen3_coder_tool, research_tool
 
 # Set up the tool-calling model
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)

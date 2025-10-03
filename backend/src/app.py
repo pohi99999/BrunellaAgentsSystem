@@ -1,11 +1,9 @@
 
-import pathlib
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Optional
-from specialists.coder_agent import coder_chain
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from specialists.coder_agent import coder_chain
 
 # Define the FastAPI app
 app = FastAPI(title="Brunella Agent Server")

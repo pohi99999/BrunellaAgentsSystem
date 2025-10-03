@@ -1,7 +1,9 @@
-from langchain_core.tools import tool
-from specialists.research_agent.graph import graph as research_graph
-from specialists.coder_agent import coder_chain
 from langchain_core.messages import HumanMessage
+from langchain_core.tools import tool
+
+from specialists.coder_agent import coder_chain
+from specialists.research_agent.graph import graph as research_graph
+
 
 @tool
 def research_tool(query: str) -> str:
@@ -13,8 +15,7 @@ def research_tool(query: str) -> str:
 
 @tool
 def qwen3_coder_tool(language: str, prompt: str) -> str:
-    """
-    Use this tool for coding tasks. It takes a programming language and a prompt describing the desired code,
+    """Use this tool for coding tasks. It takes a programming language and a prompt describing the desired code,
     invokes the specialist Qwen3 coder agent, and returns the generated code.
     """
     print(f"--- Invoking specialist coder agent for language '{language}' with prompt: {prompt} ---")

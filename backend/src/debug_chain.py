@@ -1,11 +1,13 @@
 # G:\\Brunella\\projects\\BrunellaAgentSystem\\backend\\src\\debug_chain.py
 
 import sys
+
 # Add the app directory to the path to allow imports
 sys.path.insert(0, "/app")
 
-from specialists.coder_agent import coder_chain
 import traceback
+
+from specialists.coder_agent import coder_chain
 
 print("-- Starting internal chain debugger --")
 

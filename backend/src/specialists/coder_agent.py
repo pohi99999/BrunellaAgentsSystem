@@ -3,15 +3,15 @@
 import os
 
 try:
-    from langchain_ollama.chat_models import ChatOllama  # type: ignore
-    from langchain_core.prompts import ChatPromptTemplate  # type: ignore
     from langchain_core.output_parsers import StrOutputParser  # type: ignore
+    from langchain_core.prompts import ChatPromptTemplate  # type: ignore
+    from langchain_ollama.chat_models import ChatOllama  # type: ignore
     _HAS_LANGCHAIN_OLLAMA = True
 except Exception:
     _HAS_LANGCHAIN_OLLAMA = False
     import json
-    import urllib.request
     import urllib.error
+    import urllib.request
 
 # Rendszer-prompt, ami instruálja a modellt, hogy viselkedjen kódolóként
 CODE_GENERATION_SYSTEM_PROMPT = """
@@ -25,8 +25,7 @@ Kizárólagos feladatod, hogy a kapott prompt alapján magas minőségű, tiszta
 """
 
 def get_coder_agent_executor():
-    """
-    Létrehozza és visszaadja a Qwen3 kódoló ügynököt,
+    """Létrehozza és visszaadja a Qwen3 kódoló ügynököt,
     ami egy egyszerű, Ollama-alapú LangChain lánc.
     """
     # Csatlakozás a lokálisan futó Ollama-n keresztül a qwen3 modellhez

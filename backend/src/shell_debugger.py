@@ -22,7 +22,7 @@ for imp in imports_to_test:
         exec(imp, globals(), locals())
         print("  -> OK")
     except Exception as e:
-        print(f"\n---" + " !! IMPORT FAILED !! ---")
+        print("\n---" + " !! IMPORT FAILED !! ---")
         print(f"Failed on import: {imp}")
         print(f"Exception Type: {type(e).__name__}")
         print(f"Exception Details: {e}")
