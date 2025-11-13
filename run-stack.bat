@@ -4,6 +4,13 @@ echo   Brunella Agent System Stack
 echo ==============================
 cd /d G:\Brunella\projects\BrunellaAgentSystem
 
+if not exist .env (
+	echo Nincs .env fajl a gyokerben, masolas .env.example alapjan...
+	copy .env.example .env >nul
+	echo   >> .env
+	echo # Tipp: toltstd ki a GEMINI_API_KEY, QWEN_API_KEY es LANGSMITH_API_KEY valtozokat.>>.env
+)
+
 rem Engedelyezzuk a BuildKitet es elokeszitjuk a lokalis build cache-t (G: meghajto)
 set DOCKER_BUILDKIT=1
 

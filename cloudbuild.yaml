@@ -1,0 +1,101 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _PROJECT_ID: your-gcp-project
+  _REGION: europe-west1
+  _ARTIFACT_REPO: brunella
+  _BACKEND_SERVICE: brunella-backend
+  _FRONTEND_SERVICE: brunella-frontend
+  _PUBLIC_API_BASE: https://brunella-backend-example-ew.a.run.app/agent
+  _QWEN_CODER_MODEL: qwen-coder-plus-latest
+  _QWEN_API_BASE: https://dashscope.aliyuncs.com/compatible-mode/v1
+
+timeout: 1800s
+
+steps:
+  - id: backend-tests
+    name: python:3.11
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        set -euo pipefail
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pytest
+
+  - id: frontend-build-check
+    name: node:20
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        set -euo pipefail
+        cd frontend
+        npm ci
+        npm run lint
+        npm run build
+
+  - id: build-backend-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - "-f"
+      - backend/Dockerfile
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-backend:${SHORT_SHA}"
+      - backend
+
+  - id: build-frontend-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - "-f"
+      - frontend/Dockerfile
+      - "--build-arg"
+      - "VITE_API_URL=${_PUBLIC_API_BASE}"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-frontend:${SHORT_SHA}"
+      - frontend
+
+  - id: push-backend-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - "${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-backend:${SHORT_SHA}"
+
+  - id: push-frontend-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - "${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-frontend:${SHORT_SHA}"
+
+  - id: deploy-backend
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - run
+      - deploy
+      - "${_BACKEND_SERVICE}"
+      - "--image=${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-backend:${SHORT_SHA}"
+      - "--region=${_REGION}"
+      - "--project=${_PROJECT_ID}"
+      - "--allow-unauthenticated"
+      - "--set-secrets=GEMINI_API_KEY=projects/${_PROJECT_ID}/secrets/GEMINI_API_KEY:latest,QWEN_API_KEY=projects/${_PROJECT_ID}/secrets/QWEN_API_KEY:latest,LANGSMITH_API_KEY=projects/${_PROJECT_ID}/secrets/LANGSMITH_API_KEY:latest"
+      - "--set-env-vars=QWEN_CODER_MODEL=${_QWEN_CODER_MODEL},QWEN_API_BASE=${_QWEN_API_BASE}"
+
+  - id: deploy-frontend
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - run
+      - deploy
+      - "${_FRONTEND_SERVICE}"
+      - "--image=${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-frontend:${SHORT_SHA}"
+      - "--region=${_REGION}"
+      - "--project=${_PROJECT_ID}"
+      - "--allow-unauthenticated"
+
+images:
+  - "${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-backend:${SHORT_SHA}"
+  - "${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REPO}/brunella-frontend:${SHORT_SHA}"

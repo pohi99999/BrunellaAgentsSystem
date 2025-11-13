@@ -10,10 +10,12 @@ services:
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - QWEN_API_KEY=${QWEN_API_KEY}
+      - QWEN_CODER_MODEL=${QWEN_CODER_MODEL:-qwen-coder-plus-latest}
+      - QWEN_API_BASE=${QWEN_API_BASE:-https://dashscope.aliyuncs.com/compatible-mode/v1}
       - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
       - DATABASE_URL=postgresql://brunella:secret@db:5432/agents
       - REDIS_URL=redis://redis:6379/0
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5-coder:7b}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen3:7b}
     
     ports:
       - "8000:8000"

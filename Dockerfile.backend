@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+# Alaprendszer frissítése és szükséges csomagok telepítése
+RUN apt-get update && apt-get install -y \
+    git curl build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Munkakönyvtár beállítása
+WORKDIR /app
+
+# Python függőségek másolása és telepítése
+COPY pyproject.toml /app/
+RUN pip install --upgrade pip
+RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-root
+
+# Projektfájlok másolása
+COPY . /app
+
+# Port kitétele (FastAPI default: 8000)
+EXPOSE 8000
+
+# Backend futtatása (pl. FastAPI Uvicorn szerverrel)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

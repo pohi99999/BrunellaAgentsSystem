@@ -1,25 +1,20 @@
 FROM python:3.11-slim
 
-# Alap csomagok
-RUN apt-get update && apt-get install -y \
-    git curl build-essential \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Függőségek telepítése
-COPY pyproject.toml /app/
-# Használjuk a BuildKit cache-t a pip és poetry cache-hez
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=cache,target=/root/.cache/pypoetry \
-    pip install --upgrade pip && pip install poetry && poetry config virtualenvs.create false
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git curl build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Másold a teljes projektet
-COPY . /app
+COPY pyproject.toml ./
+COPY src ./src
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=cache,target=/root/.cache/pypoetry \
-    poetry install --no-root --no-interaction --no-ansi
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir .
 
-# Indítsd az API-t Uvicorn-nal
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY . .
+
+CMD ["uvicorn", "agent_api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

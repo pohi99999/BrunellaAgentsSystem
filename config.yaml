@@ -1,9 +1,9 @@
 # config.yaml - Gemini CLI / Brunella
 llm:
   provider: openai
-  model: qwen2.5-coder-32b-instruct
-  base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
-  api_key: ${OPENAI_API_KEY}
+  model: ${QWEN_CODER_MODEL}
+  base_url: ${QWEN_API_BASE}
+  api_key: ${QWEN_API_KEY}
 
 memory:
   enabled: true

@@ -1,0 +1,49 @@
+{
+  "name": "BrunellaAgentsSystem",
+  "description": "Több-ügynökös AI orchestrator FastAPI + LangGraph + React stackkel.",
+  "version": "0.3.0-dev",
+  "owners": [
+    {
+      "team": "Pohánka és Társa Kft.",
+      "contact": "info@pohanka.company"
+    }
+  ],
+  "services": [
+    {
+      "name": "backend",
+      "language": "Python 3.11",
+      "frameworks": ["FastAPI", "LangGraph"],
+      "dockerfile": "backend/Dockerfile",
+      "env": [
+        "GEMINI_API_KEY",
+        "QWEN_API_KEY",
+        "QWEN_CODER_MODEL",
+        "QWEN_API_BASE",
+        "LANGSMITH_API_KEY",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "OLLAMA_MODEL"
+      ]
+    },
+    {
+      "name": "frontend",
+      "language": "TypeScript",
+      "frameworks": ["React", "Vite"],
+      "dockerfile": "frontend/Dockerfile",
+      "env": ["VITE_API_URL"]
+    }
+  ],
+  "infrastructure": {
+    "local": "Docker Compose (backend, frontend, Postgres, Redis)",
+    "cloud": "Cloud Build + Artifact Registry + Cloud Run (europe-west1)"
+  },
+  "ci": {
+    "github_actions": ".github/workflows/ci.yml",
+    "cloud_build": "cloudbuild.yaml"
+  },
+  "compliance": {
+    "secrets": ["Secret Manager (GEMINI, QWEN, LANGSMITH)", "GitHub Secrets"],
+    "monitoring": ["Cloud Monitoring", "Lighthouse CI", "Playwright"]
+  },
+  "lastUpdated": "2025-11-13"
+}
