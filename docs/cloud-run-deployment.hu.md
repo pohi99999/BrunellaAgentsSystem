@@ -4,9 +4,9 @@ Ez a dokumentum lépésről lépésre bemutatja, hogyan állíthatod be a Brunel
 
 > **Ajánlott felállás**
 >
-> * Helyi fejlesztés: `docker compose` + Postgres/Redis konténerek (ingyenes).
-> * Felhő: Artifact Registry + Cloud Build + Cloud Run (backend, frontend). Titkok kezelése: Secret Manager.
-> * Adatbázis/Redis: kezdetben maradjon a helyi gépen; később válthatsz Cloud SQL + Memorystore párosra.
+> - Helyi fejlesztés: `docker compose` + Postgres/Redis konténerek (ingyenes).
+> - Felhő: Artifact Registry + Cloud Build + Cloud Run (backend, frontend). Titkok kezelése: Secret Manager.
+> - Adatbázis/Redis: kezdetben maradjon a helyi gépen; később válthatsz Cloud SQL + Memorystore párosra.
 
 ---
 
@@ -23,7 +23,7 @@ gcloud config set project <PROJECT_ID>
 gcloud config set builds/use_kaniko True
 ```
 
-*Ajánlott régió:* `europe-west1` (Frankfurt) – jól illeszkedik a `cloudbuild.yaml` alapértelmezéseihez.
+_Ajánlott régió:_ `europe-west1` (Frankfurt) – jól illeszkedik a `cloudbuild.yaml` alapértelmezéseihez.
 
 ---
 
@@ -100,6 +100,7 @@ Ha ezek zöldek, mehet a commit + push a `main` (vagy kiválasztott) branch-re, 
 4. A későbbi deploy parancsok (`cloudbuild.yaml`) felülírják az image-ket és beállítják a titkokat.
 
 **Ajánlott konfigurációk**
+
 - CPU: 1, memória: 1 GiB (backend), 512 MiB (frontend) – igény szerint később növelhető.
 - Konkurencia: 10–20 (backend), 80 (frontend).
 
