@@ -6,6 +6,27 @@ import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { ChatMessagesView } from "@/components/ChatMessagesView";
 import { Button } from "@/components/ui/button";
 
+interface GenerateQueryEvent {
+  search_query?: string[];
+}
+
+interface WebResearchSource {
+  label?: string;
+  url?: string;
+  summary?: string;
+}
+
+interface WebResearchEvent {
+  sources_gathered?: WebResearchSource[];
+}
+
+type LangGraphEvent = Partial<{
+  generate_query: GenerateQueryEvent;
+  web_research: WebResearchEvent;
+  reflection: Record<string, unknown>;
+  finalize_answer: Record<string, unknown>;
+}>;
+
 export default function App() {
   const [processedEventsTimeline, setProcessedEventsTimeline] = useState<
     ProcessedEvent[]
@@ -18,7 +39,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = import.meta.env.DEV
     ? "http://localhost:8000/agent"
-    : (import.meta as any).env.VITE_API_URL || "http://localhost:8000/agent";
+    : import.meta.env.VITE_API_URL ?? "http://localhost:8000/agent";
 
   const thread = useStream<{
     messages: Message[];
@@ -26,10 +47,10 @@ export default function App() {
     max_research_loops: number;
     reasoning_model: string;
   }>({
-            apiUrl,
+    apiUrl,
     assistantId: "agent",
     messagesKey: "messages",
-    onUpdateEvent: (event: any) => {
+    onUpdateEvent: (event: LangGraphEvent) => {
       let processedEvent: ProcessedEvent | null = null;
       if (event.generate_query) {
         processedEvent = {
@@ -40,7 +61,7 @@ export default function App() {
         const sources = event.web_research.sources_gathered || [];
         const numSources = sources.length;
         const uniqueLabels = [
-          ...new Set(sources.map((s: any) => s.label).filter(Boolean)),
+          ...new Set(sources.map((s: WebResearchSource) => s.label).filter(Boolean)),
         ];
         const exampleLabels = uniqueLabels.slice(0, 3).join(", ");
         processedEvent = {
@@ -64,11 +85,11 @@ export default function App() {
       if (processedEvent) {
         setProcessedEventsTimeline((prevEvents) => [
           ...prevEvents,
-          processedEvent!,
+          processedEvent,
         ]);
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       setError(error.message);
     },
   });
