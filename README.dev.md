@@ -10,12 +10,14 @@
 
 | Kulcs               | Jelentés                                                                                   |
 | ------------------- | ------------------------------------------------------------------------------------------ |
-| `GEMINI_API_KEY`    | Google Gemini 1.5 Pro a fő orchestratorhoz.                                                |
+| `GEMINI_API_KEY`    | Google Gemini 1.5 Pro a fő orchestratorhoz (lokálisan közvetlen env-ből olvasva).          |
 | `QWEN_API_KEY`      | DashScope kulcs a Qwen 3 Coder API-hoz.                                                    |
 | `QWEN_CODER_MODEL`  | Alapértelmezett: `qwen-coder-plus-latest`.                                                 |
 | `QWEN_API_BASE`     | OpenAI kompatibilis végpont, default: `https://dashscope.aliyuncs.com/compatible-mode/v1`. |
 | `LANGSMITH_API_KEY` | Telemetria / LangSmith dashboard.                                                          |
 | `OLLAMA_MODEL`      | Lokális fallback modell (pl. `qwen3:7b`).                                                  |
+| `ENVIRONMENT`       | `development` (alapértelmezett) vagy `production` – utóbbinál a kulcsot Secret Managerből olvassuk. |
+| `GCP_PROJECT_ID`    | Secret Manager projekt azonosítója; kötelező, ha `ENVIRONMENT=production`.                 |
 
 ## Hasznos parancsok
 

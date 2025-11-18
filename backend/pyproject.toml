@@ -19,6 +19,7 @@ dependencies = [
     "langgraph-api",
     "fastapi",
     "google-genai",
+    "google-cloud-secret-manager",
     "google-cloud-managed-identities",
     "langchain-community",
     "tavily-python",
