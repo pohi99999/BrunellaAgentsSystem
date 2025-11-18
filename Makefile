@@ -1,3 +1,8 @@
+ifneq (,$(wildcard .env))
+include .env
+export $(shell sed -n 's/^\([A-Za-z0-9_][A-Za-z0-9_]*\)=.*/\1/p' .env)
+endif
+
 .PHONY: help dev-frontend dev-backend dev
 
 help:
