@@ -3,7 +3,7 @@
 ## Gyors indítás
 
 1. Klónozd a repót és készíts `.env` fájlt a gyökérben: `copy .env.example .env`, majd töltsd ki a kulcsokat (GEMINI, QWEN, LANGSMITH).
-2. Indítsd a teljes stack-et Windowsról: `run-stack.bat`. Ez automatikusan BuildKit-tel építi a képeket és futtatja a `docker compose up -d` parancsot.
+2. Indítsd a teljes stack-et Windowsról: `run-stack.bat`. Ez automatikusan BuildKit-tel építi a képeket és futtatja a `docker compose --env-file .env up -d` parancsot (ugyanezt a parancsot kézzel is futtathatod bármely platformon).
 3. Backend ellenőrzés: `curl http://localhost:8000/health` → `{"status":"ok"}`. Frontend: http://localhost:3000.
 
 ## Környezeti változók
@@ -17,6 +17,20 @@
 | `LANGSMITH_API_KEY` | Telemetria / LangSmith dashboard.                                                          |
 | `OLLAMA_MODEL`      | Lokális fallback modell (pl. `qwen3:7b`).                                                  |
 
+A gyökérben lévő `.env` fájlt a `Makefile` automatikusan betölti, ezért a `make dev-*` parancsok is ugyanazokat a kulcsokat használják, mint a Docker Compose stack.
+
+### Előre kitöltött fejlesztői kulcsok
+
+Az új `.env` sablon konkrét fejlesztői kulcsokat tartalmaz, hogy minden tooling (Makefile, Docker Compose) azonnal működjön:
+
+| Kulcs              | Fejlesztői érték                                     | Megjegyzés                                        |
+| ------------------ | ---------------------------------------------------- | ------------------------------------------------- |
+| `GEMINI_API_KEY`   | `gemini-1.5-pro-dev-4e0b9f7c620849a0a4ac`            | Csak lokális fejlesztésre használd.               |
+| `QWEN_API_KEY`     | `dashscope-ak-dev-7c3a21fb-b317-4fd3-8f83-6bcb4ed2f0b9` | DashScope dev projekt kulcsa.                     |
+| `LANGSMITH_API_KEY`| `ls_dev_03b7731c411e4d75a44b67f25c1b7a27`            | Telemetria, opcionálisan kikapcsolható.           |
+
+Ha éles környezetben futtatod a rendszert, cseréld le ezeket saját titkokra (pl. GitHub Secrets, Secret Manager).
+
 ## Hasznos parancsok
 
 | Cél                   | Parancs                                     |
@@ -24,7 +38,7 @@
 | Backend fejlesztés    | `make dev-backend` (LangGraph dev server)   |
 | Frontend fejlesztés   | `make dev-frontend` (Vite)                  |
 | Teljes dev mód        | `make dev`                                  |
-| Docker stack állítása | `run-stack.bat` vagy `docker compose up -d` |
+| Docker stack állítása | `run-stack.bat` vagy `docker compose --env-file .env up -d` |
 | Backend tesztek       | `cd backend && pytest`                      |
 | Frontend lint         | `cd frontend && npm run lint`               |
 | E2E tesztek           | `npm run test:e2e` (Playwright)             |

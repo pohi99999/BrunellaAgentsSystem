@@ -23,11 +23,11 @@ if errorlevel 1 (
 	exit /b 1
 )
 
-echo Inditas: docker compose up -d (ha nem megy, docker-compose up -d)
-docker compose up -d
+echo Inditas: docker compose --env-file .env up -d (ha nem megy, docker-compose --env-file .env up -d)
+docker compose --env-file .env up -d
 if errorlevel 1 (
-	echo docker compose nem elerheto, probalkozas docker-compose v1-el...
-	docker-compose up -d
+        echo docker compose nem elerheto, probalkozas docker-compose v1-el...
+        docker-compose --env-file .env up -d
 	if errorlevel 1 (
 		echo HIBA: A docker compose inditas sikertelen.
 		echo Ellenorizd, hogy a Docker Desktop fut-e, es az env valtozok be vannak allitva (.env).
