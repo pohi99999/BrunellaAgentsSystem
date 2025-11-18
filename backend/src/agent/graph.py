@@ -1,5 +1,4 @@
 
-import os
 from typing import Literal
 
 from langchain_core.messages import ToolCall
@@ -10,9 +9,14 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from .state import AgentState
 from .tools import research_tool, qwen3_coder_tool
+from utils.secrets import get_gemini_api_key
 
 # Set up the tool-calling model
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
+llm = ChatGoogleGenerativeAI(
+    model="gemini-1.5-pro-latest",
+    temperature=0,
+    api_key=get_gemini_api_key(),
+)
 tools = [research_tool, qwen3_coder_tool]
 llm_with_tools = llm.bind_tools(tools)
 

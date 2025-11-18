@@ -139,6 +139,8 @@ gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
 
 Ha külön service accounttal futtatnád a backend/frontendet (pl. későbbi GCP erőforrás eléréshez), hozd létre és add meg a `--service-account` flaget a `cloudbuild.yaml` deploy lépéseiben.
 
+> **Fontos:** mivel az orchestrator Secret Managerből olvassa a `GEMINI_API_KEY` kulcsot, a futtató service accountnak is szüksége van a `roles/secretmanager.secretAccessor` szerepkörre ugyanazon projekten.
+
 ---
 
 ## 7. Cloud Build trigger GitHubra
@@ -168,7 +170,7 @@ A gyökérben lévő `cloudbuild.yaml` már tartalmazza a szükséges lépéseke
 4. Képek pusholása az Artifact Registry-be.
 5. Cloud Run deploy backend + frontend:
    - Titkok: `GEMINI_API_KEY`, `QWEN_API_KEY`, `LANGSMITH_API_KEY` Secret Managerből.
-   - Extra env: `QWEN_CODER_MODEL`, `QWEN_API_BASE` (szükség szerint módosítható substitutions-szel).
+   - Extra env: `QWEN_CODER_MODEL`, `QWEN_API_BASE`, valamint `ENVIRONMENT=production` és `GCP_PROJECT_ID=<PROJECT_ID>` (szükség szerint módosítható substitutions-szel).
 
 **Tipp:** ha staging környezetet szeretnél később, duplázd meg a deploy lépést másik szolgáltatásnévvel és substitution-nel.
 

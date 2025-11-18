@@ -83,7 +83,7 @@ steps:
       - "--project=${_PROJECT_ID}"
       - "--allow-unauthenticated"
       - "--set-secrets=GEMINI_API_KEY=projects/${_PROJECT_ID}/secrets/GEMINI_API_KEY:latest,QWEN_API_KEY=projects/${_PROJECT_ID}/secrets/QWEN_API_KEY:latest,LANGSMITH_API_KEY=projects/${_PROJECT_ID}/secrets/LANGSMITH_API_KEY:latest"
-      - "--set-env-vars=QWEN_CODER_MODEL=${_QWEN_CODER_MODEL},QWEN_API_BASE=${_QWEN_API_BASE}"
+      - "--set-env-vars=QWEN_CODER_MODEL=${_QWEN_CODER_MODEL},QWEN_API_BASE=${_QWEN_API_BASE},ENVIRONMENT=production,GCP_PROJECT_ID=${_PROJECT_ID}"
 
   - id: deploy-frontend
     name: gcr.io/cloud-builders/gcloud
