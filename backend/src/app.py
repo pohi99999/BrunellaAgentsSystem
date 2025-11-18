@@ -1,11 +1,15 @@
 
 import pathlib
-from fastapi import FastAPI
-from pydantic import BaseModel
+import logging
 from typing import Optional
-from specialists.coder_agent import coder_chain
-from fastapi.staticfiles import StaticFiles
+
+from fastapi import FastAPI
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+
+from specialists.coder_agent import coder_chain
 
 # Define the FastAPI app
 app = FastAPI(title="Brunella Agent Server")
@@ -40,14 +44,27 @@ class CodeRequest(BaseModel):
     prompt: str
 
 
+logger = logging.getLogger(__name__)
+
+
+def run_coder_chain(*, language: str, prompt: str) -> str:
+    """Blocking helper that invokes the coder chain."""
+    return coder_chain.invoke({
+        "language": language,
+        "prompt": prompt,
+    })
+
+
 @app.post("/coder/generate")
-def coder_generate(req: CodeRequest) -> dict:
+async def coder_generate(req: CodeRequest) -> dict:
     try:
-        code = coder_chain.invoke({
-            "language": req.language,
-            "prompt": req.prompt,
-        })
+        code = await run_in_threadpool(
+            run_coder_chain,
+            language=req.language,
+            prompt=req.prompt,
+        )
         return {"code": code}
     except Exception as e:
+        logger.exception("Failed to generate code for language %s", req.language)
         return {"error": str(e)}
 
