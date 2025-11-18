@@ -63,3 +63,61 @@
 2. **Qwen hívás hibát ad** – futtasd `echo %QWEN_API_KEY%` Windows parancssorban vagy `printenv` Linuxon, illetve ellenőrizd a DashScope számlát.
 3. **Playwright teszt lefagy** – `npx playwright install --with-deps` futtatása után ismételd meg.
 4. **Lighthouse hiba** – töröld a `.lighthouse` mappát, futtasd újra a `npm run build && npm run audit:ux` parancsot, majd nézd át a `docs/ux_checklist.md` pontjait.
+
+## DevOps tisztító ügynök futtatása
+
+A `devops_agent.py` segédprogram minden nap 03:00-kor lefuttatja a `docker system prune -a -f --volumes` parancsot, és naplózza a
+felszabadított tárhelyet. A script önállóan futtatható Pythonból:
+
+```bash
+pip install schedule
+python devops_agent.py
+```
+
+### Példa systemd service
+
+1. Másold a repót egy hosszú távon futó hostra.
+2. Hozd létre a `/etc/systemd/system/devops-agent.service` fájlt:
+
+```
+[Unit]
+Description=Brunella DevOps cleanup agent
+After=docker.service
+
+[Service]
+WorkingDirectory=/opt/BrunellaAgentsSystem
+ExecStart=/usr/bin/python3 /opt/BrunellaAgentsSystem/devops_agent.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. `sudo systemctl daemon-reload && sudo systemctl enable --now devops-agent`.
+
+### Cron futtatás
+
+Alternatíva, ha nem szeretnél service-t létrehozni: `crontab -e`, majd add hozzá:
+
+```
+@reboot cd /opt/BrunellaAgentsSystem && /usr/bin/python3 devops_agent.py >> devops_agent.log 2>&1
+```
+
+A script saját `while True` ciklusa miatt a cron bejegyzés egyszer indul el boot után, és folyamatosan életben tartja az ügynököt.
+
+### Háttér konténer
+
+Docker Compose vagy Kubernetes környezetben futtathatsz egy minimalista konténert is:
+
+```yaml
+services:
+  devops-agent:
+    build: .
+    command: ["python", "devops_agent.py"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/app
+    restart: unless-stopped
+```
+
+Ezzel a módszerrel az ügynök ugyanúgy eléri a host Docker daemonját (`docker.sock`), és gondoskodik a napi karbantartásról.
