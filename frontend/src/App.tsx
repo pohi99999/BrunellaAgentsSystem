@@ -88,8 +88,12 @@ export default function App() {
         ]);
       }
     },
+    onError: (err: Error) => {
+      console.error("Stream error:", err);
+      setError(err.message || "An unknown error occurred");
+    },
   },
-  });
+  );
 
 useEffect(() => {
   if (scrollAreaRef.current) {

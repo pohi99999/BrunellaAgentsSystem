@@ -248,7 +248,10 @@ export function ChatMessagesView({
       setCopiedMessageId(messageId);
       setTimeout(() => setCopiedMessageId(null), 2000); // Reset after 2 seconds
     } catch (err) {
-      console.error("Failed to copy text: ", err);
+      // Silently fail in production; user will notice the copy didn't work
+      if (import.meta.env.DEV) {
+        console.error("Failed to copy text: ", err);
+      }
     }
   };
   return (

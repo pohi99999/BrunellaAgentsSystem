@@ -14,7 +14,7 @@ try:
     from langchain_core.prompts import ChatPromptTemplate  # type: ignore
 
     _HAS_LANGCHAIN_OLLAMA = True
-except Exception:  # pragma: no cover - opcionális függőség
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - opcionális függőség
     _HAS_LANGCHAIN_OLLAMA = False
 
 # Rendszer-prompt, ami instruálja a modellt, hogy viselkedjen kódolóként
