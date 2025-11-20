@@ -46,7 +46,7 @@ const mdComponents = {
     <Badge className="text-xs mx-0.5">
       <a
         className={cn("text-blue-400 hover:text-blue-300 text-xs", className)}
-        href={href}
+        href={href as string}
         target="_blank"
         rel="noopener noreferrer"
         {...props}
@@ -149,7 +149,7 @@ const HumanMessageBubble: React.FC<HumanMessageBubbleProps> = ({
     <div
       className={`text-white rounded-3xl break-words min-h-7 bg-neutral-700 max-w-[100%] sm:max-w-[90%] px-4 pt-3 rounded-br-lg`}
     >
-      <ReactMarkdown components={mdComponents}>
+      <ReactMarkdown components={mdComponents as any}>
         {typeof message.content === "string"
           ? message.content
           : JSON.stringify(message.content)}
@@ -196,16 +196,15 @@ const AiMessageBubble: React.FC<AiMessageBubbleProps> = ({
           />
         </div>
       )}
-      <ReactMarkdown components={mdComponents}>
+      <ReactMarkdown components={mdComponents as any}>
         {typeof message.content === "string"
           ? message.content
           : JSON.stringify(message.content)}
       </ReactMarkdown>
       <Button
         variant="default"
-        className={`cursor-pointer bg-neutral-700 border-neutral-600 text-neutral-300 self-end ${
-          message.content.length > 0 ? "visible" : "hidden"
-        }`}
+        className={`cursor-pointer bg-neutral-700 border-neutral-600 text-neutral-300 self-end ${message.content.length > 0 ? "visible" : "hidden"
+          }`}
         onClick={() =>
           handleCopy(
             typeof message.content === "string"
@@ -261,9 +260,8 @@ export function ChatMessagesView({
             return (
               <div key={message.id || `msg-${index}`} className="space-y-3">
                 <div
-                  className={`flex items-start gap-3 ${
-                    message.type === "human" ? "justify-end" : ""
-                  }`}
+                  className={`flex items-start gap-3 ${message.type === "human" ? "justify-end" : ""
+                    }`}
                 >
                   {message.type === "human" ? (
                     <HumanMessageBubble
