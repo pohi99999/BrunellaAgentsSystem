@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import Mock, patch
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 
-from agent.graph import orchestrator_node, route_after_orchestrator
+from agent.graph import orchestrator_node, router
 from agent.state import AgentState
 
 
@@ -93,7 +93,7 @@ class TestRouteAfterOrchestrator:
             ]
         }
 
-        result = route_after_orchestrator(state)
+        result = router(state)
         assert result == "tools"
 
     def test_route_to_end_when_no_tool_calls(self):
@@ -102,7 +102,7 @@ class TestRouteAfterOrchestrator:
             "messages": [AIMessage(content="Here's your answer")]
         }
 
-        result = route_after_orchestrator(state)
+        result = router(state)
         assert result == "__end__"
 
     def test_route_handles_mixed_messages(self):
@@ -116,7 +116,7 @@ class TestRouteAfterOrchestrator:
             ]
         }
 
-        result = route_after_orchestrator(state)
+        result = router(state)
         assert result == "__end__"  # Last message has no tool calls
 
 
@@ -157,7 +157,7 @@ class TestOrchestratorIntegration:
         assert orch_result["messages"][0].tool_calls[0]["name"] == "research_tool"
 
         # Verify routing
-        route = route_after_orchestrator(orch_result)
+        route = router(orch_result)
         assert route == "tools"
 
 
