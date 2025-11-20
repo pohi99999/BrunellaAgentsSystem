@@ -58,15 +58,42 @@ Ez a dokumentum összefoglalja a BrunellaAgentsSystem (LangGraph alapú többüg
 
 Windows PowerShell környezetben javasolt:
 
-```
+```powershell
+cd E:\1_Brunella
+.\.venv\Scripts\Activate.ps1
 cd backend
-py -3.11 -m venv .venv311
-./.venv311/Scripts/Activate.ps1
-pip install -e .[dev]
-pytest -v --maxfail=1 --tb=short
+$env:PYTHONPATH="src"
+pytest -v --tb=short
 ```
 
-Ha import hibák maradnak: ellenőrizd hogy aktiváltad-e a venv-et és a `src` könyvtár benne van-e a szerkesztő Python Path konfigurációjában (alternatíva: `set PYTHONPATH=src`).
+### 4.1 Teszt Eredmények (2025-11-20)
+
+**✅ Újonnan Létrehozott Tesztek - Mind Sikeres (15/15)**
+- `test_research_utils.py`: 6/6 sikeres
+  - get_research_topic utility függvény tesztjei
+  - Egy üzenet, több üzenet, üres lista, AI üzenetek, spec. karakterek, hosszú üzenetek
+- `test_secrets.py`: 9/9 sikeres
+  - get_secret Secret Manager hívás
+  - get_gemini_api_key development/production mód
+  - Env változók, hibakezelés, fallback logika
+
+**✅ Már Meglévő Tesztek - Mind Sikeres (5/5)**
+- `test_api.py`: 2/2 sikeres
+  - App import teszt
+  - Health endpoint teszt
+- `test_coder_agent.py`: 3/3 sikeres
+  - DashScope chain hiányzó API kulccsal
+  - DashScope chain invokáció mock clienttel
+  - Fallback chain local stub használat
+
+**📊 Összesen: 20/20 teszt sikeres (100%)**
+
+**Megjegyzések:**
+- Python 3.14 kompatibilitási figyelmeztetések (Pydantic V1, PyO3)
+- `langgraph-api` csomag kihagyva (jsonschema-rs Rust függőség Python 3.14 inkompatibilitás)
+- Deprecation warnings: Pydantic Field metadata, LangGraph config_schema → context_schema
+
+Ha import hibák maradnak: ellenőrizd hogy aktiváltad-e a venv-et és a `src` könyvtár benne van-e a szerkesztő Python Path konfigurációjában.
 
 ## 5. Kulcskezelés / Biztonság
 
