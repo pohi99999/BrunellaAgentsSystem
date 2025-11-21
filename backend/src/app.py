@@ -11,9 +11,13 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
 from specialists.coder_agent import coder_chain
+from src.utils.middleware import APIKeyMiddleware
 
 # Define the FastAPI app
 app = FastAPI(title="Brunella Agent Server")
+
+# Add the API Key middleware, excluding the /health endpoint
+app.add_middleware(APIKeyMiddleware, public_paths={"/health"})
 
 # Environment-aware CORS configuration
 ALLOWED_ORIGINS = os.getenv(
@@ -29,12 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# The langgraph dev server will automatically discover and serve the graphs
-# defined in langgraph.json. We don't need to manually add the routes here.
-
-# The frontend serving is temporarily removed for debugging.
-
 
 @app.get("/health")
 def health() -> dict:
@@ -94,4 +92,3 @@ async def coder_generate(req: CodeRequest) -> dict:
     except Exception as e:
         logger.exception("Failed to generate code for language %s", req.language)
         raise HTTPException(status_code=500, detail="Code generation failed")
-
