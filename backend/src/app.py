@@ -1,19 +1,48 @@
-
 import os
-import pathlib
 import logging
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from specialists.coder_agent import coder_chain
+from src.utils.auth import get_api_key
+from src.utils.prompt_validator import validate_prompt as validate_prompt_injection
+from src.utils.logging_config import setup_logging
+
+# Set up logging
+setup_logging()
+
+# Define the rate limiter
+limiter = Limiter(key_func=get_remote_address)
 
 # Define the FastAPI app
-app = FastAPI(title="Brunella Agent Server")
+app = FastAPI(title="Brunella Agent Server", dependencies=[Depends(get_api_key)])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+@limiter.limit("5/minute")
+async def agent_rate_limiter(request: Request):
+    """
+    Dummy function to apply the rate limit to the /agent endpoint.
+    """
+    pass
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    if request.url.path.startswith("/agent"):
+        try:
+            await agent_rate_limiter(request)
+        except RateLimitExceeded as e:
+            return _rate_limit_exceeded_handler(request, e)
+    response = await call_next(request)
+    return response
+
 
 # Environment-aware CORS configuration
 ALLOWED_ORIGINS = os.getenv(
@@ -29,12 +58,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# The langgraph dev server will automatically discover and serve the graphs
-# defined in langgraph.json. We don't need to manually add the routes here.
-
-# The frontend serving is temporarily removed for debugging.
-
 
 @app.get("/health")
 def health() -> dict:
@@ -64,7 +87,7 @@ class CodeRequest(BaseModel):
     def validate_prompt(cls, v: str) -> str:
         if not v or not v.strip():
             raise ValueError("Prompt cannot be empty")
-        return v.strip()
+        return validate_prompt_injection(v.strip())
 
 
 logger = logging.getLogger(__name__)
@@ -79,7 +102,8 @@ def run_coder_chain(*, language: str, prompt: str) -> str:
 
 
 @app.post("/coder/generate")
-async def coder_generate(req: CodeRequest) -> dict:
+@limiter.limit("10/minute")
+async def coder_generate(req: CodeRequest, request: Request) -> dict:
     """Generate code using Qwen3 Coder based on natural language prompt."""
     try:
         code = await run_in_threadpool(
@@ -94,4 +118,3 @@ async def coder_generate(req: CodeRequest) -> dict:
     except Exception as e:
         logger.exception("Failed to generate code for language %s", req.language)
         raise HTTPException(status_code=500, detail="Code generation failed")
-
