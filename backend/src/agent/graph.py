@@ -12,20 +12,21 @@ from .tools import research_tool, qwen3_coder_tool
 from utils.secrets import get_gemini_api_key
 
 # Set up the tool-calling model
-llm = ChatGoogleGenerativeAI(
+_base_llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-pro-latest",
     temperature=0,
     api_key=get_gemini_api_key(),
 )
 tools = [research_tool, qwen3_coder_tool]
-llm_with_tools = llm.bind_tools(tools)
+# Bind tools once; the resulting object is still patcholható a tesztekben
+llm = _base_llm.bind_tools(tools)
 
 # Define the orchestrator node
 def orchestrator_node(state: AgentState):
     """The main node that decides which tool to call based on the user's request."""
     # A teljes beszélgetést adjuk át, mert a Gemini kliens listát vár
     conversation = state["messages"]
-    response = llm_with_tools.invoke(conversation)
+    response = llm.invoke(conversation)
     return {"messages": [response]}
 
 # Define the router
