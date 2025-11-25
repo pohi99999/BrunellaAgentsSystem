@@ -17,7 +17,7 @@ dev-frontend:
 
 dev-backend:
 	@echo "Starting backend development server..."
-	@cd backend && langgraph dev
+	@cd backend && ../.venv/bin/langgraph dev
 
 # Run frontend and backend concurrently
 dev:

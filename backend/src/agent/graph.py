@@ -23,10 +23,9 @@ llm_with_tools = llm.bind_tools(tools)
 # Define the orchestrator node
 def orchestrator_node(state: AgentState):
     """The main node that decides which tool to call based on the user's request."""
-    # Get the latest message
-    message = state["messages"][-1]
-    # Call the model with the message and tools
-    response = llm_with_tools.invoke(message)
+    # A teljes beszélgetést adjuk át, mert a Gemini kliens listát vár
+    conversation = state["messages"]
+    response = llm_with_tools.invoke(conversation)
     return {"messages": [response]}
 
 # Define the router
