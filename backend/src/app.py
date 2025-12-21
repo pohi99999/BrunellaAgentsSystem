@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
-from specialists.coder_agent import coder_chain
+from src.specialists.coder_agent import coder_chain
 from src.utils.middleware import APIKeyMiddleware
 
 # Define the FastAPI app

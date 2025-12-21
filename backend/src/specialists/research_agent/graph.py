@@ -28,14 +28,18 @@ from .utils import (
     insert_citation_markers,
     resolve_urls,
 )
-from utils.secrets import get_gemini_api_key
+from src.utils.secrets import get_gemini_api_key
 
 load_dotenv()
 
-GEMINI_API_KEY = get_gemini_api_key()
 
-# Used for Google Search API
-genai_client = Client(api_key=GEMINI_API_KEY)
+def _get_genai_client() -> Client:
+    """Create a Google GenAI client lazily.
+
+    Import-time initialization makes tests fail when GEMINI_API_KEY isn't set.
+    We construct the client only when the graph actually runs.
+    """
+    return Client(api_key=get_gemini_api_key())
 
 
 # Nodes
@@ -63,7 +67,7 @@ def generate_query(state: OverallState, config: RunnableConfig) -> QueryGenerati
         model=configurable.query_generator_model,
         temperature=1.0,
         max_retries=2,
-        api_key=GEMINI_API_KEY,
+        api_key=get_gemini_api_key(),
     )
     structured_llm = llm.with_structured_output(SearchQueryList)
 
@@ -110,7 +114,7 @@ def web_research(state: WebSearchState, config: RunnableConfig) -> OverallState:
     )
 
     # Uses the google genai client as the langchain client doesn't return grounding metadata
-    response = genai_client.models.generate_content(
+    response = _get_genai_client().models.generate_content(
         model=configurable.query_generator_model,
         contents=formatted_prompt,
         config={
@@ -165,7 +169,7 @@ def reflection(state: OverallState, config: RunnableConfig) -> ReflectionState:
         model=reasoning_model,
         temperature=1.0,
         max_retries=2,
-        api_key=GEMINI_API_KEY,
+        api_key=get_gemini_api_key(),
     )
     result = llm.with_structured_output(Reflection).invoke(formatted_prompt)
 
@@ -244,7 +248,7 @@ def finalize_answer(state: OverallState, config: RunnableConfig):
         model=reasoning_model,
         temperature=0,
         max_retries=2,
-        api_key=GEMINI_API_KEY,
+        api_key=get_gemini_api_key(),
     )
     result = llm.invoke(formatted_prompt)
 

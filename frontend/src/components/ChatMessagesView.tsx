@@ -12,6 +12,7 @@ import {
   ActivityTimeline,
   ProcessedEvent,
 } from "@/components/ActivityTimeline"; // Assuming ActivityTimeline is in the same dir or adjust path
+import { AgentGraphPanel } from "@/components/AgentGraphPanel";
 
 // Markdown component props type from former ReportView
 type MdComponentProps = {
@@ -255,9 +256,10 @@ export function ChatMessagesView({
     }
   };
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 overflow-y-auto" ref={scrollAreaRef}>
-        <div className="p-4 md:p-6 space-y-2 max-w-4xl mx-auto pt-16">
+    <div className="flex h-full">
+      <div className="flex flex-col flex-1 min-w-0">
+        <ScrollArea className="flex-1 overflow-y-auto" ref={scrollAreaRef}>
+          <div className="p-4 md:p-6 space-y-2 max-w-4xl mx-auto pt-16">
           {messages.map((message, index) => {
             const isLast = index === messages.length - 1;
             return (
@@ -310,14 +312,25 @@ export function ChatMessagesView({
                 </div>
               </div>
             )}
-        </div>
-      </ScrollArea>
-      <InputForm
-        onSubmit={onSubmit}
-        isLoading={isLoading}
-        onCancel={onCancel}
-        hasHistory={messages.length > 0}
-      />
+          </div>
+        </ScrollArea>
+        <InputForm
+          onSubmit={onSubmit}
+          isLoading={isLoading}
+          onCancel={onCancel}
+          hasHistory={messages.length > 0}
+        />
+      </div>
+
+      <aside className="hidden lg:block w-[360px] border-l border-neutral-700 bg-neutral-800/30 p-4">
+        <AgentGraphPanel
+          isLoading={isLoading}
+          messages={messages}
+          liveActivityEvents={liveActivityEvents}
+          historicalActivities={historicalActivities}
+          onSubmit={onSubmit}
+        />
+      </aside>
     </div>
   );
 }

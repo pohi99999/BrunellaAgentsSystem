@@ -75,7 +75,7 @@ Ha éles környezetben futtatod a rendszert, cseréld le ezeket saját titkokra 
 
 ## Hibakeresés
 
-1. **Backend nem indul** – ellenőrizd a .env-et és hogy a `docker-data/postgres` / `docker-data/redis` könyvtárak írhatók-e.
+1. **Backend nem indul** – ellenőrizd a `.env`-et (különösen `GEMINI_API_KEY`) és nézd meg a backend konténer logját.
 2. **Qwen hívás hibát ad** – futtasd `echo %QWEN_API_KEY%` Windows parancssorban vagy `printenv` Linuxon, illetve ellenőrizd a DashScope számlát.
 3. **Playwright teszt lefagy** – `npx playwright install --with-deps` futtatása után ismételd meg.
 4. **Lighthouse hiba** – töröld a `.lighthouse` mappát, futtasd újra a `npm run build && npm run audit:ux` parancsot, majd nézd át a `docs/ux_checklist.md` pontjait.

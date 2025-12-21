@@ -175,7 +175,7 @@ const handleCancel = useCallback(() => {
 
 return (
   <div className="flex h-screen bg-neutral-800 text-neutral-100 font-sans antialiased">
-    <main className="h-full w-full max-w-4xl mx-auto">
+    <main className="h-full w-full max-w-6xl mx-auto">
       {thread.messages.length === 0 ? (
         <WelcomeScreen
           handleSubmit={handleSubmit}

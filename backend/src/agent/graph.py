@@ -1,5 +1,5 @@
 
-from typing import Literal
+from typing import Any, Literal
 
 from langchain_core.messages import ToolCall
 from langgraph.graph import StateGraph, START
@@ -9,24 +9,36 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from .state import AgentState
 from .tools import research_tool, qwen3_coder_tool
-from utils.secrets import get_gemini_api_key
+from functools import lru_cache
 
-# Set up the tool-calling model
-_base_llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro-latest",
-    temperature=0,
-    api_key=get_gemini_api_key(),
-)
+from src.utils.secrets import get_gemini_api_key
+
 tools = [research_tool, qwen3_coder_tool]
-# Bind tools once; the resulting object is still patcholható a tesztekben
-llm = _base_llm.bind_tools(tools)
+
+# Patchable handle for tests; when None, we lazily create a bound LLM.
+llm: Any | None = None
+
+
+@lru_cache(maxsize=1)
+def _get_llm():
+    """Create and bind the tool-calling LLM lazily.
+
+    This keeps module import side-effect free so tests don't require secrets.
+    """
+    base_llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-pro-latest",
+        temperature=0,
+        api_key=get_gemini_api_key(),
+    )
+    return base_llm.bind_tools(tools)
 
 # Define the orchestrator node
 def orchestrator_node(state: AgentState):
     """The main node that decides which tool to call based on the user's request."""
     # A teljes beszélgetést adjuk át, mert a Gemini kliens listát vár
     conversation = state["messages"]
-    response = llm.invoke(conversation)
+    model = llm or _get_llm()
+    response = model.invoke(conversation)
     return {"messages": [response]}
 
 # Define the router

@@ -1,7 +1,7 @@
 import logging
 from langchain_core.tools import tool
-from specialists.research_agent.graph import graph as research_graph
-from specialists.coder_agent import coder_chain
+from src.specialists.research_agent.graph import graph as research_graph
+from src.specialists.coder_agent import coder_chain
 from langchain_core.messages import HumanMessage
 
 logger = logging.getLogger(__name__)
