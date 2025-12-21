@@ -1,5 +1,15 @@
 # Brunella Agent System – Fejlesztői kézikönyv
 
+## Befektetői demó (gyors runbook)
+
+1. Hozz létre egy `.env` fájlt a gyökérben a `.env.example` alapján (a kulcsokat saját értékekre cserélve).
+2. Indítás: `docker compose --env-file .env up -d --build`
+3. Ellenőrzés:
+  - Backend: `curl http://localhost:8000/health` → `{"status":"ok"}`
+  - Frontend: http://localhost:3000
+
+Részletesebb jegyzet és következő lépések: `docs/SESSION_NOTES_2025-12-21.hu.md`.
+
 ## Gyors indítás
 
 1. Klónozd a repót és készíts `.env` fájlt a gyökérben: `copy .env.example .env`, majd töltsd ki a kulcsokat (GEMINI, QWEN, LANGSMITH).
@@ -21,17 +31,10 @@
 
 A gyökérben lévő `.env` fájlt a `Makefile` automatikusan betölti, ezért a `make dev-*` parancsok is ugyanazokat a kulcsokat használják, mint a Docker Compose stack.
 
-### Előre kitöltött fejlesztői kulcsok
+### Megjegyzés a titkokról
 
-Az új `.env` sablon konkrét fejlesztői kulcsokat tartalmaz, hogy minden tooling (Makefile, Docker Compose) azonnal működjön:
-
-| Kulcs              | Fejlesztői érték                                     | Megjegyzés                                        |
-| ------------------ | ---------------------------------------------------- | ------------------------------------------------- |
-| `GEMINI_API_KEY`   | `gemini-1.5-pro-dev-4e0b9f7c620849a0a4ac`            | Csak lokális fejlesztésre használd.               |
-| `QWEN_API_KEY`     | `dashscope-ak-dev-7c3a21fb-b317-4fd3-8f83-6bcb4ed2f0b9` | DashScope dev projekt kulcsa.                     |
-| `LANGSMITH_API_KEY`| `ls_dev_03b7731c411e4d75a44b67f25c1b7a27`            | Telemetria, opcionálisan kikapcsolható.           |
-
-Ha éles környezetben futtatod a rendszert, cseréld le ezeket saját titkokra (pl. GitHub Secrets, Secret Manager).
+- A repó nem tartalmazhat valódi API-kulcsokat.
+- Fejlesztéshez a `.env.example` csak placeholder értékeket ad; a tényleges kulcsokat `.env`-be (lokálisan) vagy Secret Manager/GitHub Secrets-be tedd.
 
 ## Hasznos parancsok
 

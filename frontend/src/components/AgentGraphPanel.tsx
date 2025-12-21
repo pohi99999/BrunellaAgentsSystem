@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import type { Message } from "@langchain/langgraph-sdk";
-import type { ProcessedEvent } from "./ActivityTimeline";
-import { cn } from "../lib/utils";
+import type { ProcessedEvent } from "@/components/ActivityTimeline";
+import { cn } from "@/lib/utils";
 
 type StepKey =
   | "orchestrator"
