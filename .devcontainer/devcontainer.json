@@ -73,7 +73,8 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"georgewfraser.vscode-javac"
+				"georgewfraser.vscode-javac",
+				"googlecloudtools.cloudcode"
 			]
 		}
 	}
