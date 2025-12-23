@@ -84,11 +84,10 @@ def test_research_agent_full_cycle(mock_gemini_api_key, mock_genai_client, mock_
         "web_research_result": [],
         "sources_gathered": [],
         "search_query": [],
+        "initial_search_query_count": 1,
+        "max_research_loops": 1,
         "research_loop_count": 0,
-        "number_of_ran_queries": 0,
-        "is_sufficient": False,
-        "knowledge_gap": "",
-        "follow_up_queries": [],
+        "reasoning_model": "gemini-2.0-flash-exp",
     }
     
     # Invoke the graph
@@ -147,11 +146,10 @@ def test_research_agent_with_max_loops(mock_gemini_api_key, mock_genai_client, m
             "web_research_result": [],
             "sources_gathered": [],
             "search_query": [],
+            "initial_search_query_count": 1,
+            "max_research_loops": 2,
             "research_loop_count": 0,
-            "number_of_ran_queries": 0,
-            "is_sufficient": False,
-            "knowledge_gap": "",
-            "follow_up_queries": [],
+            "reasoning_model": "gemini-2.0-flash-exp",
         }
         
         config = {
@@ -174,11 +172,10 @@ def test_research_agent_empty_message():
         "web_research_result": [],
         "sources_gathered": [],
         "search_query": [],
+        "initial_search_query_count": 1,
+        "max_research_loops": 1,
         "research_loop_count": 0,
-        "number_of_ran_queries": 0,
-        "is_sufficient": False,
-        "knowledge_gap": "",
-        "follow_up_queries": [],
+        "reasoning_model": "gemini-2.0-flash-exp",
     }
     
     # This should raise an error or handle gracefully
