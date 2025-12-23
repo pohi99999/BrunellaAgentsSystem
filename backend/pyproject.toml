@@ -25,6 +25,7 @@ dependencies = [
     "tavily-python",
     "openai",
     "watchfiles<0.19.0",
+    "slowapi>=0.1.9",
 ]
 
 

@@ -4,17 +4,26 @@ import pathlib
 import logging
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from src.specialists.coder_agent import coder_chain
 from src.utils.middleware import APIKeyMiddleware
+from src.utils.prompt_validator import validate_prompt
+
+# Define rate limiter
+limiter = Limiter(key_func=get_remote_address)
 
 # Define the FastAPI app
 app = FastAPI(title="Brunella Agent Server")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Add the API Key middleware, excluding the /health endpoint
 app.add_middleware(APIKeyMiddleware, public_paths={"/health"})
@@ -59,10 +68,9 @@ class CodeRequest(BaseModel):
     
     @field_validator("prompt")
     @classmethod
-    def validate_prompt(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise ValueError("Prompt cannot be empty")
-        return v.strip()
+    def validate_prompt_field(cls, v: str) -> str:
+        # Use the centralized prompt validator
+        return validate_prompt(v)
 
 
 logger = logging.getLogger(__name__)
@@ -77,7 +85,8 @@ def run_coder_chain(*, language: str, prompt: str) -> str:
 
 
 @app.post("/coder/generate")
-async def coder_generate(req: CodeRequest) -> dict:
+@limiter.limit("10/minute")
+async def coder_generate(request: Request, req: CodeRequest) -> dict:
     """Generate code using Qwen3 Coder based on natural language prompt."""
     try:
         code = await run_in_threadpool(
