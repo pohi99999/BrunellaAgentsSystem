@@ -1,4 +1,3 @@
-
 import pytest
 
 from src.utils.prompt_validator import validate_prompt, is_safe_prompt, BLOCKED_PATTERNS
