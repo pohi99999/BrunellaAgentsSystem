@@ -28,8 +28,31 @@ Részletesebb jegyzet és következő lépések: `docs/SESSION_NOTES_2025-12-21.
 | `OLLAMA_MODEL`      | Lokális fallback modell (pl. `qwen3:7b`).                                                  |
 | `ENVIRONMENT`       | `development` (alapértelmezett) vagy `production` – utóbbinál a kulcsot Secret Managerből olvassuk. |
 | `GCP_PROJECT_ID`    | Secret Manager projekt azonosítója; kötelező, ha `ENVIRONMENT=production`.                 |
+| `API_KEY`           | API kulcs hitelesítéshez (opcionális, ha nincs beállítva, az auth ki van kapcsolva).       |
+| `LOG_LEVEL`         | Naplózási szint (DEBUG, INFO, WARNING, ERROR) - alapértelmezett: INFO.                     |
 
 A gyökérben lévő `.env` fájlt a `Makefile` automatikusan betölti, ezért a `make dev-*` parancsok is ugyanazokat a kulcsokat használják, mint a Docker Compose stack.
+
+## Függőségkezelés
+
+A projekt a `pyproject.toml`-ban ~= operátorral pin-eli a függőségeket, amely lehetővé teszi a patch frissítéseket, de major/minor változásokat blokkolja (pl. `langgraph~=0.2.6` = `>=0.2.6, <0.3.0`).
+
+**Függőségek frissítése:**
+```bash
+# Backend függőségek telepítése
+cd backend
+pip install -e .[dev]
+
+# Vagy uv használatával (gyorsabb)
+uv pip install -e .[dev]
+```
+
+**Fontos függőségek:**
+- `langgraph`, `langchain` - AI ügynök framework
+- `fastapi`, `uvicorn` - Web szerver
+- `slowapi` - Rate limiting
+- `google-genai`, `langchain-google-genai` - Gemini integráció
+- `openai` - Qwen/OpenAI kompatibilis API-k
 
 ### Megjegyzés a titkokról
 

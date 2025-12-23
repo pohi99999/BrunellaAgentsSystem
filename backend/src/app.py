@@ -16,6 +16,11 @@ from slowapi.errors import RateLimitExceeded
 from src.specialists.coder_agent import coder_chain
 from src.utils.middleware import APIKeyMiddleware
 from src.utils.prompt_validator import validate_prompt
+from src.utils.logging_config import setup_logging
+
+# Setup logging at module level (before app creation)
+setup_logging()
+logger = logging.getLogger(__name__)
 
 # Define rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -71,9 +76,6 @@ class CodeRequest(BaseModel):
     def validate_prompt_field(cls, v: str) -> str:
         # Use the centralized prompt validator
         return validate_prompt(v)
-
-
-logger = logging.getLogger(__name__)
 
 
 def run_coder_chain(*, language: str, prompt: str) -> str:

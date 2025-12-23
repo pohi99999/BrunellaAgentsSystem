@@ -1,7 +1,10 @@
 """Prompt validation utilities to prevent prompt injection attacks."""
 
 import re
+import logging
 from typing import Pattern
+
+logger = logging.getLogger(__name__)
 
 # Blocked patterns that indicate potential prompt injection attempts
 BLOCKED_PATTERNS: list[Pattern[str]] = [
@@ -43,6 +46,11 @@ def validate_prompt(prompt: str) -> str:
     
     for pattern in BLOCKED_PATTERNS:
         if pattern.search(prompt_stripped):
+            logger.warning(
+                "Blocked potentially malicious prompt. Pattern: %s, Preview: %s",
+                pattern.pattern,
+                prompt_stripped[:100],
+            )
             raise ValueError(
                 f"Prompt contains potentially malicious pattern: {pattern.pattern}"
             )
