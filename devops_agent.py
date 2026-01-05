@@ -29,18 +29,19 @@ logging.basicConfig(
 def _format_bytes(num_bytes: int) -> str:
     """Return a human readable representation of bytes."""
     step_unit = 1024
-    units = ["B", "KiB", "MiB", "GiB", "TiB"]
+    units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"]
     size = float(num_bytes)
-    for unit in units:
-        if size < step_unit:
+    for idx, unit in enumerate(units):
+        # If we've reached the largest unit, stop scaling.
+        if size < step_unit or idx == len(units) - 1:
             return f"{size:0.2f} {unit}"
         size /= step_unit
-    return f"{size * step_unit:0.2f} PiB"
 
 
 def log_free_space() -> None:
-    """Log the total and free space for the filesystem hosting the repo."""
-    total, used, free = shutil.disk_usage(Path(__file__).resolve().anchor)
+    """Log the total and free space for the filesystem hosting this repo."""
+    repo_path = Path(__file__).resolve().parent
+    total, used, free = shutil.disk_usage(repo_path)
     logging.info(
         "Disk usage - total: %s, used: %s, free: %s",
         _format_bytes(total),
