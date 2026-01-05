@@ -1,9 +1,7 @@
-# agent.py
-
-import os
-import vertexai
 import subprocess
 from typing import List, Dict
+
+import vertexai
 from google.cloud import compute_v1
 from vertexai.generative_models import GenerativeModel, Tool, FunctionDeclaration, Part
 from google.api_core.exceptions import PermissionDenied
@@ -25,6 +23,33 @@ def list_vm_instances(project_id: str, zone: str) -> List[Dict[str, str]]:
     except Exception as e:
         print(f"[Brunella Eszköz Hiba]: Hiba a VM listázásakor: {str(e)}")
         return [{"error": f"Hiba a VM listázásakor: {str(e)}"}]
+
+
+def _get_function_call(response):
+    """Best-effort extraction of a function call from a Vertex response."""
+    try:
+        parts = response.candidates[0].content.parts  # type: ignore[attr-defined]
+    except Exception:
+        return None
+
+    for part in parts:
+        function_call = getattr(part, "function_call", None)
+        if function_call and getattr(function_call, "name", None):
+            return function_call
+    return None
+
+
+def _response_text(response) -> str:
+    """Extract printable text from a Vertex response."""
+    text = getattr(response, "text", None)
+    if text:
+        return text
+    try:
+        parts = response.candidates[0].content.parts  # type: ignore[attr-defined]
+        return "".join([getattr(p, "text", "") for p in parts]).strip()
+    except Exception:
+        return str(response)
+
 
 # --- FŐPROGRAM ---
 def main():
@@ -73,10 +98,41 @@ def main():
     # --- MANUÁLIS FÜGGVÉNYHÍVÁSI CIKLUS ---
     response = chat_session.send_message(prompt)
     
-    while response.candidates[0].content.parts[0].function_call.name:
-        function_call = response.candidates[0].content.parts[0].function_call
+    max_tool_turns = 10
+    tool_turns = 0
+
+    function_call = _get_function_call(response)
+    while function_call and tool_turns < max_tool_turns:
+        tool_turns += 1
         print(f"[Brunella Gondolkodik]: Eszközt kell használnom: '{function_call.name}'")
         
         if function_call.name == "list_vm_instances":
-            args = function_call.args
-            tool_result = list_vm_ins
+            args = dict(getattr(function_call, "args", {}) or {})
+            tool_result = list_vm_instances(
+                project_id=args.get("project_id", GCP_PROJECT),
+                zone=args.get("zone", GCP_ZONE),
+            )
+        else:
+            tool_result = {"error": f"Ismeretlen eszköz: {function_call.name}"}
+
+        # Tool result back to the model.
+        response = chat_session.send_message(
+            Part.from_function_response(
+                name=function_call.name,
+                response={"result": tool_result},
+            )
+        )
+        function_call = _get_function_call(response)
+
+    if tool_turns >= max_tool_turns:
+        print("!!! Figyelem: túl sok tool-kör, megszakítva a végtelen ciklus elkerülésére.")
+
+    final_text = _response_text(response)
+    if final_text:
+        print(f"\n[Brunella Válasza]:\n{final_text}")
+    else:
+        print("\n[Brunella Válasza]: (nincs szöveges válasz)")
+
+
+if __name__ == "__main__":
+    main()
